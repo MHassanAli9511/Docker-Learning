@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  flask:
+    build: ./flask_app
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 0
+    depends_on:
+      - redis
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "5000:5000"
+    depends_on:
+      - flask
+
+ 
+  redis:
+    build: ./redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:
