@@ -3,7 +3,13 @@ Flask + Redis Multi-container Application
 
 ## Table of Contents
 
-
+- [Overview](#overview)
+- [Technologies Used](#technologies-used)
+- [Build Process](#build-process)
+- [Additional Features](#additional-features)
+- [Challenges and Fixes](#challenges-and-fixes)
+- [Project Structure](#project-structure)
+- [What I Learned](#what-i-learned)
 
 ## Overview
 This project is a mutli-container application built as part of the CoderCo Containers Challenge, requiring containerisation and orchestration, via Docker and Docker Compose. 
@@ -183,4 +189,37 @@ When running the app with Nginx, the container failed to load due to a missing r
 <img width="940" height="115" alt="image" src="https://github.com/user-attachments/assets/96003a81-efb0-4645-9bb6-ac67ba413723" />
 
 
+## Project Structure
 
+```text
+Challenge/
+├── flask_app/
+│   ├── Dockerfile
+│   └── My_Flask_app.py
+│
+├── nginx/
+│   ├── Dockerfile
+│   └── nginx.conf
+│
+├── redis/
+│   └── Dockerfile
+│
+└── docker-compose.yml
+```
+
+## What I Learned
+
+Building this project helped me understand how multiple Docker concepts work together within a real-world multi-container application.
+
+| Concept | What I Learned |
+|---|---|
+| Containerisation | How to write Dockerfiles and containerise an application, moving from running the app locally to running it inside Docker within its own isolated environment. |
+| Multi-container orchestration | How Docker Compose connects multiple services together, allowing containers to communicate with each other by referencing service names instead of hardcoded addresses. |
+| Persistent storage | How Docker volumes work and why they are needed. Without volumes, container data is lost when containers are removed or recreated. Mounting a volume redirects storage outside the container so the data survives restarts. |
+| Environment Variables | How to decouple configuration from code by passing connection details through Docker Compose and reading them in Python using the `os` module, making the application more portable and easier to configure. |
+| Reverse Proxying & Load Balancing | How Nginx can sit in front of multiple Flask containers, distributing incoming traffic across them, and why exposing a single Nginx port is necessary when scaling containerised applications. |
+| Container Networking | How containers communicate with each other internally through Docker networks and service names, such as Flask connecting to Redis using the `redis` service name. |
+| Debugging & Troubleshooting | The importance of testing each stage before moving on, along with using commands such as `docker compose down -v` to reset the environment and troubleshoot issues cleanly. |
+| Documentation & Project Structure | How to structure a multi-container project by separating services into their own directories with dedicated Dockerfiles and configuration files managed through Docker Compose. |
+
+This project also helped reinforce concepts learned throughout the module while improving my confidence debugging issues, reading documentation, and understanding how different containerised services work together.
