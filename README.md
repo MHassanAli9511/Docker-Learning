@@ -157,3 +157,30 @@ I tested the container, and not only does it work, but it also sotred the data f
 <img width="623" height="177" alt="image" src="https://github.com/user-attachments/assets/6f714e98-cfec-404b-bd9c-9266f9a87c26" />
 
 
+## Challenges and Fixes
+
+1. **Typo in Redis package name**
+
+When installing the Redis Python package, reddis was installed instead of redis, causing a No module named 'reddis' error when running the app. Fixed by uninstalling the incorrect package and reinstalling with the correct name redis.
+
+<img width="563" height="80" alt="image" src="https://github.com/user-attachments/assets/79ecb4a0-deba-4aba-ac3f-bec23e5d7a49" />
+
+
+2. **Undefined environment variables in Flask**
+
+When modifying the Flask app to use environment variables for the Redis connection details, the variables REDIS_HOST, REDIS_PORT and REDIS_DB were referenced in app.py without being defined first, causing a NameError: name 'REDIS_HOST' is not defined error. 
+<img width="457" height="86" alt="image" src="https://github.com/user-attachments/assets/7b5d5f31-f01a-42a6-bfa9-cee7b2d6627f" />
+
+
+Fixed by importing the os module and using os.getenv() to pull the values from the container environment set by Docker Compose.
+
+<img width="940" height="314" alt="image" src="https://github.com/user-attachments/assets/ec51576b-afbb-4a54-b496-34cabf13cab0" />
+
+3. **Nginx configuration missing required structure**
+
+When running the app with Nginx, the container failed to load due to a missing required structure in nginx.conf. The config needed an events {} block and an http {} block to be valid. Once the correct structure was added, along with a server block defining the port to listen on and the upstream Flask service to forward requests to, the app loaded successfully.
+
+<img width="940" height="115" alt="image" src="https://github.com/user-attachments/assets/96003a81-efb0-4645-9bb6-ac67ba413723" />
+
+
+
