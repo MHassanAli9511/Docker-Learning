@@ -63,3 +63,97 @@ Created a Dockerfile for Redis by referencing the official Redis image from Dock
 
 <img width="395" height="163" alt="image" src="https://github.com/user-attachments/assets/a69d7a3a-37f6-499e-84eb-65ddeae115f6" />
 
+
+### Configure Docker Compose
+
+Created a docker-compose.yml to define and run both the Flask app and Redis as a multi-container application, handling the networking between the two services so Flask can communicate with Redis by referencing it by its service name.
+
+<img width="427" height="409" alt="image" src="https://github.com/user-attachments/assets/973ba887-39a0-42af-9c67-d5a51657a6b3" />
+
+Ran both containers using: 
+```bash
+docker-compose up --build
+```
+
+Verified Docker Compose was successfully connecting the Flask and Redis services.
+<img width="460" height="171" alt="image" src="https://github.com/user-attachments/assets/737f6a54-18f9-430c-9dc6-640d7d58c9a3" />
+
+
+## Additional Features 
+I then added additional features to enhance the application and further explore Docker Compose functionality. 
+
+
+### Persistent Storage for Redis
+
+Configured Redis to use a named Docker volume (redis-data) in docker-compose.yml, mounting it to /data inside the container — redirecting Redis's storage to outside the container so data is managed by Docker rather than lost when the container stops. Added a top-level volumes block to tell Docker to create and manage the redis-data volume.
+
+<img width="463" height="555" alt="image" src="https://github.com/user-attachments/assets/0b93c0d0-f527-41fa-9ff3-a212d79e22bd" />
+
+
+To apply these changes, i did run : 
+
+```bash
+docker-compose down -v
+```
+
+followed by : 
+
+```bash
+docker-compose up --build
+```
+
+In order to wipe everything and rebuild everything. However, i learned that while this workflow is useful for debugging, but in oder to test persistance, i had to ommit the -v for subsequent resets, to keep the volume intact. 
+
+I kept this for all subsequent changes:
+
+I stopped with: 
+```bash
+docker-compose down
+```
+And rebuild and ran with: 
+
+```bash
+docker-compose up --build
+```
+
+
+### Environmental Variables
+
+Modified the Flask app to read Redis connection details (host, port, and database number) from environment variables using Python's built-in os module, rather than hardcoding them directly in app.py. The values were then defined in docker-compose.yml, so when Docker Compose runs the container it sets them in the container environment and the Flask app reads them from there.
+
+```python
+r = redis.Redis(host='redis', port=6379, db=0)
+```
+
+ ↓          
+
+```python
+r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
+```
+
+Essentially i am signposting these settings to the docker compose file.
+
+Which also required me to input the values within my docker compose file: 
+<img width="334" height="160" alt="image" src="https://github.com/user-attachments/assets/4aee2acc-1445-4022-96c8-d3b7b12a4e96" />
+
+
+### Scaling with Nginx Load Balancer
+
+Scaling means to run more than one instance of your flask app. Running multiple containers on the same host port caused a conflict, as only one container can bind to port 5000 at a time, so Nginx was introduced as a reverse proxy to sit in front of the Flask instances and distribute traffic across them.
+
+<img width="264" height="218" alt="image" src="https://github.com/user-attachments/assets/1f45c018-6088-46ed-bbf5-a731526e8853" />
+
+Created a dedicated nginx folder containing a Dockerfile and nginx.conf. 
+
+*Key thing i learned was how to strcutre multi-container applications by separating each service into its own directory, each containing its own Dockerfile and configuration files. These services were then referenced and managed together within the `docker-compose.yml` file.*
+
+
+The config defines an upstream block pointing to the Flask service and a server block that listens on port 5002 and forwards requests to the Flask containers. Port exposure was removed from the Flask service in docker-compose.yml and moved to Nginx instead, so all traffic enters through Nginx on port 5002.
+
+<img width="673" height="344" alt="image" src="https://github.com/user-attachments/assets/51ca0666-6109-4e4b-a3ab-44ec7b89b1f3" />
+
+I tested the container, and not only does it work, but it also sotred the data from the last time: 
+
+<img width="623" height="177" alt="image" src="https://github.com/user-attachments/assets/6f714e98-cfec-404b-bd9c-9266f9a87c26" />
+
+
