@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>CountTrak Pro</title>
+    <style>
+ body {
+    background-color: #0f172a;
+    color: #f8fafc;
+    font-family: Arial, sans-serif;
+    padding: 40px;
+    background-image: url('https://images.unsplash.com/photo-1777508921732-646da5428adf?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+}
+
+.card {
+    background: rgba(10, 20, 55, 0.65);
+    backdrop-filter: blur(6px);
+    border-radius: 12px;
+    padding: 40px;
+    max-width: 500px;
+    margin: 100px auto;
+}
+
+h1 {
+    color: #f8fafc;
+    font-weight: 500;
+    text-align: center;
+}
+
+p {
+    color: #64748b;
+    text-align: center;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 0.5px solid #1e293b;
+    font-size: 14px;
+}
+
+.accent {
+    color: #34d399;
+    font-weight: 500;
+}
+
+    </style>  
+
+  </head>
+  <body>
+   <div class="card">
+    <h1>CountTrak Pro</h1>
+    <p>Visit Tracking Dashboard</p>
+    <div class="stat-row">
+        <span>Total Visits</span>
+        <span class="accent">{{ visit_count }}</span>
+    </div>
+    <div class="stat-row">
+        <span>First Visit</span>
+        <span class="accent">{{ first_visit }}</span>
+    </div>
+    <div class="stat-row">
+        <span>Last Visit</span>
+        <span class="accent">{{ last_visit }}</span>
+    </div>
+</div>
+  </body>
+</html>
