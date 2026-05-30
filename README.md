@@ -10,6 +10,7 @@ Flask + Redis Multi-container Application
 - [Challenges and Fixes](#challenges-and-fixes)
 - [Project Structure](#project-structure)
 - [What I Learned](#what-i-learned)
+- [Personalising the Application](#personalising-the-application)
 
 ## Overview
 This project is a mutli-container application built as part of the CoderCo Containers Challenge, requiring containerisation and orchestration, via Docker and Docker Compose. 
@@ -223,3 +224,119 @@ Building this project helped me understand how multiple Docker concepts work tog
 | Documentation & Project Structure | How to structure a multi-container project by separating services into their own directories with dedicated Dockerfiles and configuration files managed through Docker Compose. |
 
 This project also helped reinforce concepts learned throughout the module while improving my confidence debugging issues, reading documentation, and understanding how different containerised services work together.
+
+
+# Personalising the Application
+
+After completing the original challenge requirements, I wanted to add my own personal touch to the application and expand it beyond a simple counter project.
+
+### Frontend Improvements
+
+The application was upgraded from plain text responses to fully rendered HTML templates using Flask’s `render_template()` functionality.
+
+I created custom pages with:
+- A dark themed UI
+- Background image styling
+- Card-based layouts
+- Navigation buttons between pages
+- Improved formatting and readability
+
+This made the application feel more like a real dashboard rather than a basic demo application.
+
+<img width="600" height="351" alt="Main (2)" src="https://github.com/user-attachments/assets/63b4aa90-f5c3-4026-9f68-b189ef203d0d" />
+
+
+
+
+### Additional Features
+
+I also expanded the functionality of the application by adding:
+
+- A `/stats` route displaying:
+  - Total visits
+  - First visit timestamp
+  - Last visit timestamp
+- Dynamic milestone messages on the counter page
+- Redis-backed timestamp tracking
+- Multiple HTML template pages
+
+
+<img width="944" height="275" alt="image" src="https://github.com/user-attachments/assets/928cdfcc-3dc2-46e5-83cd-198e2254b911" />
+
+
+
+### Load Balancing Demonstration
+
+To better demonstrate scaling and reverse proxying, I used Python’s `socket` module to display the hostname of the Flask container handling each request.
+
+This allowed the application to visibly demonstrate load balancing when multiple Flask containers were running behind Nginx.
+
+Example:
+
+```python
+hostname = socket.gethostname()
+```
+
+When refreshing the page while scaled, different container IDs could be seen handling requests.
+
+---
+
+<img width="600" height="335" alt="Recording 2026-05-30 013543" src="https://github.com/user-attachments/assets/eb860298-aac6-4254-8d92-264fae71eeb7" />
+
+
+
+
+
+## Additional Challenges & Fixes
+
+### Environment Variable Error
+
+After moving the Redis configuration into environment variables, the Flask application produced the following error when run locally:
+
+```python
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'NoneType'
+```
+
+This happened because the application was expecting environment variables such as `REDIS_PORT` to be provided by Docker Compose. When running the Python file directly outside of Docker Compose, those variables did not exist, causing Python to receive `None` instead of a valid value.
+
+The issue was resolved by running the application through Docker Compose instead of executing the Python file directly.
+
+### Flask Template Error
+
+After adding HTML templates to customise the Flask application, the application returned the following error:
+
+```python
+jinja2.exceptions.TemplateNotFound: index.html
+```
+
+This issue occurred because the `templates` directory had been created outside of the Flask application directory. Flask automatically searches for templates relative to the application location, meaning it could not locate the `index.html` file.
+
+The issue was resolved by moving the `templates` folder into the Flask application directory:
+
+```text
+flask_app/
+└── templates/
+    └── index.html
+```
+
+After rebuilding the containers, Flask was able to successfully locate and render the templates.
+
+### Redis Byte String Output
+
+While displaying Redis data on the `/stats` page, values initially appeared as byte strings:
+
+```text
+b'53'
+```
+
+This happened because Redis returns data as bytes by default.
+
+The issue was resolved by decoding the values before displaying them in the templates using:
+
+```python
+.decode('utf-8')
+```
+
+
+
+
