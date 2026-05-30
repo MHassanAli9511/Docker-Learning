@@ -4,6 +4,7 @@ from datetime import datetime
 from flask import Flask, render_template
 import redis
 import os
+import socket
 
 REDIS_HOST = os.getenv('REDIS_HOST')
 REDIS_PORT = int(os.getenv('REDIS_PORT'))
@@ -43,7 +44,8 @@ def count():
     else:
         message = "Thanks for visiting CountTrak Pro! Keep tracking your visits! 📈"
 
-    return render_template('count.html', visit_count=visits, visit_count_message=message)
+    hostname = socket.gethostname()
+    return render_template('count.html', visit_count=visits, visit_count_message=message, hostname=hostname)
 
 @app.route('/stats')
 def stats():
